@@ -56,19 +56,43 @@ export const PHASE_ONE_SUBSIDIES = [
   {
     name: "デジタル化・AI導入補助金2026",
     summary: "登録されたITツール等の導入による業務効率化・DXを支援",
-    suitableFor: "AI・クラウド・会計・受発注・顧客管理など"
+    suitableFor: "AI・クラウド・会計・受発注・顧客管理など",
+    subsidyRate: "通常枠：1/2以内（一定の最低賃金要件を満たす場合は2/3以内）",
+    subsidyAmount: "通常枠：5万円以上450万円以下（導入する業務プロセス数で区分）",
+    schedule: "第6次：2026年10月30日（金）17:00締切／交付決定は12月10日予定",
+    status: "受付中",
+    officialUrl: "https://it-shien.smrj.go.jp/",
+    officialLabel: "デジタル化・AI導入補助金2026 公式サイト"
   },
   {
     name: "小規模事業者持続化補助金",
     summary: "小規模事業者の販路開拓や業務効率化の取組を支援",
-    suitableFor: "Webサイト・広告・店舗改善・新規顧客獲得など"
+    suitableFor: "Webサイト・広告・店舗改善・新規顧客獲得など",
+    subsidyRate: "一般型・通常枠：2/3（特例の詳細は公募要領で確認）",
+    subsidyAmount: "通常上限50万円。賃金引上げ特例・インボイス特例の併用時は最大250万円",
+    schedule: "第20回：2026年11月5日受付開始、12月15日（火）17:00締切（様式4は12月4日締切）",
+    status: "受付開始前",
+    officialUrl: "https://r6.jizokukahojokin.info/",
+    officialLabel: "小規模事業者持続化補助金 公式サイト"
   },
   {
     name: "中小企業省力化投資補助金",
     summary: "人手不足に対応する設備・システム導入を支援",
-    suitableFor: "自動化設備・省力化機器・業務プロセス改善など"
+    suitableFor: "自動化設備・省力化機器・業務プロセス改善など",
+    subsidyRate: "一般型：中小企業1/2、小規模・再生事業者2/3（最低賃金引上げ特例あり）",
+    subsidyAmount: "通常上限750万円～8,000万円。大幅賃上げ特例で最大1億円",
+    schedule: "一般型第9回：11月上旬公募開始、12月上旬受付開始、12月下旬締切予定（確定日は後日公表）",
+    status: "次回公募予定",
+    officialUrl: "https://shoryokuka.smrj.go.jp/ippan/",
+    officialLabel: "中小企業省力化投資補助金（一般型）公式サイト"
   }
 ];
+
+export const SUBSIDY_INFO_VERIFIED_AT = "2026年10月23日";
+
+export const SUBSIDY_FACT_SNAPSHOT = PHASE_ONE_SUBSIDIES.map(item =>
+  `${item.name}：${item.subsidyRate}。${item.subsidyAmount}。${item.schedule}`
+).join("\n");
 
 export const CHALLENGE_PRESETS = [
   "受託開発・AI導入案件の急増に対しエンジニア・PMが不足し、要件定義や提案書・ドキュメント作成に工数が奪われ開発速度が上がらない",
