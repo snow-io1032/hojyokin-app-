@@ -1,6 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import type { UserProfileInput } from "../types.js";
 import { generateLocalPlan } from "../services/localPlanGenerator.js";
+import { SUBSIDY_FACT_SNAPSHOT, SUBSIDY_INFO_VERIFIED_AT } from "../constants.js";
 
 interface ApiRequest {
   method?: string;
@@ -38,6 +39,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       contents: `あなたは北海道の中小企業・小規模事業者向け補助金申請準備を支援するアシスタントです。採択・受給を保証せず、不明な制度要件は断定しないでください。
 簡易診断で選ばれた「${baseline.recommendedSubsidy}」向けに、具体的で説得力のある事業計画書ドラフトを作成してください。
 
+【${SUBSIDY_INFO_VERIFIED_AT}時点で公式確認済みの制度情報】
+${SUBSIDY_FACT_SNAPSHOT}
+上記にない公募日、補助率、補助上限、加点・必須要件を推測で追加しないでください。生成AIサービスは、登録済みITツール等の対象要件を満たす場合に限り補助対象となり得ます。
+
 【事業者情報】
 - 業種: ${input.industry}
 - 所在地: ${input.location}
@@ -54,7 +59,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 1. なぜその生成AIツールが必要なのか（北海道特有の広域移動・冬期積雪・労働力不足の文脈を反映）
 2. 具体的にどの業務フローをどう改革するのか（3ステップ）
 3. 浮いた時間をどの「本業（高付加価値業務）」へシフトさせるのか
-4. 定量目標（3年後に年率3%以上の労働生産性向上を達成するシミュレーション）
+4. 削減工数・付加価値向上の定量目標（入力値に基づく試算であり、制度要件の達成を断定しない）
 5. 次のアクション（必要書類、公式公募要領の確認、道内公的窓口・専門家への相談）`,
       config: {
         responseMimeType: "application/json",
