@@ -7,11 +7,12 @@ import {
   INVESTMENT_PURPOSES,
   BUDGET_PRESETS,
   PHASE_ONE_SUBSIDIES,
+  SUBSIDY_INFO_VERIFIED_AT,
   DEMO_SCENARIOS, 
   DemoScenario 
 } from '../constants';
 import { UserProfileInput } from '../types';
-import { Sparkles, Building2, Bot, AlertCircle, MapPin, ChevronDown, ChevronUp, ArrowRight, Zap } from 'lucide-react';
+import { Sparkles, Building2, Bot, AlertCircle, MapPin, ChevronDown, ChevronUp, ArrowRight, Zap, Megaphone, ExternalLink } from 'lucide-react';
 import { Spinner } from './Spinner';
 import { SeoContent } from './SeoContent';
 
@@ -100,6 +101,49 @@ export const QuickInputForm: React.FC<Props> = ({ onSubmit, loading }) => {
           </div>
         </div>
       )}
+
+      {/* Latest verified program updates */}
+      <section aria-labelledby="latest-subsidy-updates" className="overflow-hidden rounded-2xl border border-amber-200 bg-amber-50 shadow-sm">
+        <div className="border-b border-amber-200 bg-gradient-to-r from-amber-100 to-orange-50 px-4 py-4 sm:px-6">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-500 text-white">
+                <Megaphone className="h-4.5 w-4.5" aria-hidden="true" />
+              </span>
+              <div>
+                <p className="text-[11px] font-bold tracking-wider text-amber-800">最新情報</p>
+                <h2 id="latest-subsidy-updates" className="text-base font-bold leading-6 text-slate-950 sm:text-lg">
+                  主要3制度の公募情報を更新しました
+                </h2>
+                <p className="mt-0.5 text-xs leading-5 text-slate-600">画面表示・補助金診断・事業計画書ドラフトの内容に反映しています。</p>
+              </div>
+            </div>
+            <span className="self-start rounded-full border border-amber-300 bg-white px-3 py-1 text-[11px] font-bold text-amber-800 sm:self-center">
+              公式情報確認：{SUBSIDY_INFO_VERIFIED_AT}
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-px bg-amber-200 sm:grid-cols-3">
+          {PHASE_ONE_SUBSIDIES.map((item) => (
+            <a
+              key={item.name}
+              href={item.officialUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="group min-h-28 bg-white p-4 transition-colors hover:bg-amber-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-600"
+              aria-label={`${item.name}の公式情報を確認`}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <h3 className="text-sm font-bold leading-5 text-slate-900">{item.name}</h3>
+                <ExternalLink className="mt-0.5 h-4 w-4 shrink-0 text-slate-400 transition-colors group-hover:text-amber-700" aria-hidden="true" />
+              </div>
+              <p className="mt-2 text-xs font-bold leading-5 text-amber-800">{item.schedule}</p>
+              <span className="mt-2 inline-flex rounded-full bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-600">{item.status}</span>
+            </a>
+          ))}
+        </div>
+      </section>
 
       {/* Hero / Value Proposition Banner */}
       <div className="bg-gradient-to-br from-blue-900 via-slate-900 to-indigo-950 text-white rounded-2xl p-5 sm:p-8 shadow-md border border-slate-800">
