@@ -1,4 +1,5 @@
 import { UserProfileInput, BusinessPlanResult, QuantitativeMetric, SubsidyMatch } from "../types";
+import { PHASE_ONE_SUBSIDIES, SUBSIDY_INFO_VERIFIED_AT } from "../constants";
 
 export function diagnoseSubsidies(input: UserProfileInput): SubsidyMatch[] {
   const purpose = input.investmentPurpose || "まだ決まっていない";
@@ -14,21 +15,21 @@ export function diagnoseSubsidies(input: UserProfileInput): SubsidyMatch[] {
       score: Math.min(95, 48 + (purpose === "AI・IT導入" ? 32 : 0) + (aiSignals ? 15 : 0)),
       status: "確認が必要",
       reason: "AI・ITツールによる業務効率化との適合性を評価しました。",
-      checks: ["導入するITツールが対象として登録されているか", "申請枠と補助対象経費", "gBizIDプライムとSECURITY ACTIONの準備"]
+      checks: ["導入するITツールとIT導入支援事業者が登録済みか", "通常枠第6次（2026年10月30日17:00）に間に合うか", "gBizIDプライムとSECURITY ACTIONの準備"]
     },
     {
       name: "小規模事業者持続化補助金",
       score: Math.min(92, 38 + (purpose === "販路開拓・集客" ? 34 : 0) + (salesSignals ? 12 : 0) + (small ? 8 : 0)),
       status: "確認が必要",
       reason: "販路開拓・集客と、小規模事業者要件への適合性を評価しました。",
-      checks: ["業種別の常時使用する従業員数要件", "経営計画と販路開拓施策のつながり", "管轄の商工会・商工会議所への事前相談"]
+      checks: ["業種別の常時使用する従業員数要件", "第20回の様式4発行依頼を2026年12月4日までに行えるか", "管轄の商工会・商工会議所への事前相談"]
     },
     {
       name: "中小企業省力化投資補助金",
       score: Math.min(94, 42 + (purpose === "設備・省力化" ? 34 : 0) + (laborSignals ? 14 : 0)),
       status: "確認が必要",
       reason: "人手不足の解消と設備・システムによる省力化との適合性を評価しました。",
-      checks: ["カタログ注文型・一般型のどちらに該当するか", "投資前後の業務時間と付加価値額", "対象設備・経費と公募期間"]
+      checks: ["カタログ注文型・一般型のどちらに該当するか", "投資前後の業務時間と付加価値額", "一般型第9回の確定日と最新公募要領"]
     }
   ];
 
@@ -47,6 +48,9 @@ export function generateLocalPlan(input: UserProfileInput): BusinessPlanResult {
   const hourlyRate = input.hourlyLaborCost || 3200;
   const subsidyMatches = diagnoseSubsidies(input);
   const recommendedSubsidy = subsidyMatches[0].name;
+  const recommendedInfo = PHASE_ONE_SUBSIDIES.find(item => item.name === recommendedSubsidy);
+  const isDigitalAid = recommendedSubsidy === "デジタル化・AI導入補助金2026";
+  const isSustainableAid = recommendedSubsidy === "小規模事業者持続化補助金";
 
   // 定量シミュレーション計算
   const totalAnnualAdminHours = employeeCountNum * adminHoursPerPerson * 12;
@@ -121,7 +125,7 @@ export function generateLocalPlan(input: UserProfileInput): BusinessPlanResult {
 この創出された時間を、以下のような「本業（コア業務・売上直結業務）」へと大胆にシフトさせる：
 ${coreShiftText}`;
 
-  const section4Explanation = `IT導入補助金の交付要件に基づき、「3年後に労働生産性を年率3%以上向上（3年間で累計9%以上向上）」または「5年後に年率2%以上向上（5年間で累計10%以上向上）」を達成するための定量シミュレーションを策定した。`;
+  const section4Explanation = `${recommendedSubsidy}への申請準備として、削減工数と付加価値の向上効果を検討するための定量シミュレーションを策定した。ここで示す数値は入力値に基づく試算であり、制度要件の充足や採択を示すものではない。`;
   const section4CalcBasis = `【算出根拠】対象従業員${employeeCountNum}名 × 1人あたり月間削減時間${Math.round(adminHoursPerPerson * 0.45)}時間 × 12ヶ月 ＝ 年間創出時間${savedAnnualHours}時間。想定時間単価${hourlyRate.toLocaleString()}円として年間約${(valueCreatedYear1 / 10000).toFixed(1)}万円相当の経済的価値を創出。浮いた時間を高付加価値業務に投下することで、労働生産性（従業員1人あたり付加価値額）を毎年着実に伸ばす。`;
 
   const metricsTable: QuantitativeMetric[] = [
@@ -147,7 +151,7 @@ ${coreShiftText}`;
       estimatedValueCreated: `${Math.round(valueCreatedYear1 * 1.1 / 10000)} 万円`
     },
     {
-      year: "3年目（目標達成年度★要件充足）",
+      year: "3年目（目標年度案）",
       laborProductivity: "4,750,000円 /人",
       productivityGrowthRate: "+13.1%（年率換算 +4.2%）",
       annualHoursSaved: `${Math.round(savedAnnualHours * 1.15)} 時間`,
@@ -163,6 +167,11 @@ ${coreShiftText}`;
   ];
 
   const fullMarkdown = `# ${title}
+
+> 制度情報確認日：${SUBSIDY_INFO_VERIFIED_AT}
+> ${recommendedInfo?.subsidyRate || "補助率は最新公募要領で確認"}
+> ${recommendedInfo?.subsidyAmount || "補助上限は最新公募要領で確認"}
+> ${recommendedInfo?.schedule || "公募日程は公式サイトで確認"}
 
 ---
 
@@ -194,17 +203,40 @@ ${metricsTable.map(m => `| ${m.year} | ${m.laborProductivity} | **${m.productivi
 
 ### 5. 北海道内の経営者への次のアクション（申請準備と専門家連携）
 - **STEP 1：gBizIDプライムアカウントの取得（最優先）**
-  本事業計画書下書きをベースに「IT導入補助金」や各種国・道独自補助金の電子申請を行うには、デジタル庁発行の法人代表者用認証ID**「gBizIDプライム」**が必須となります。
-  ID発行には印鑑証明書の郵送審査等で**通常1〜2週間程度**を要します。公募締切直前では間に合わないリスクがあるため、まだお持ちでない経営者様は直ちに「gBizID公式サイト（gbiz-id.go.jp）」より無料発行手続きを開始してください。
+  電子申請に必要となる**「gBizIDプライム」**の有無を確認し、未取得の場合は公式サイトで最新の取得方法と所要日数を確認して早めに手続きを開始してください。
 - **STEP 2：道内提携行政書士・中小企業診断士への最終チェック委託**
-  本下書きは審査基準に基づいた骨子ですが、実際の公募回ごとの最新公募要領、導入ITツール（IT導入支援事業者の登録ツール）との適合判定、加点項目（賃上げ表明、DX認定、SECURITY ACTION等）の精査が採択率を左右します。
-  道内各地域（札幌・道央、道東・十勝・釧路・オホーツク、道南、道北）の商工会議所・商工会、またはIT導入補助金採択実績の豊富な提携行政書士・中小企業診断士への最終リーガルチェック・代理申請支援の委託をお勧めいたします。`;
+  実際の公募回ごとの最新公募要領、対象経費、必須要件、加点項目を精査する必要があります。
+  道内各地域（札幌・道央、道東・十勝・釧路・オホーツク、道南、道北）の商工会議所・商工会、よろず支援拠点、または有資格者へ提出前の確認を依頼してください。`;
+
+  const actionSteps = isDigitalAid
+    ? [
+        "通常枠第6次（2026年10月30日17:00）の公式公募要領と申請スケジュールを確認",
+        "gBizIDプライムとSECURITY ACTIONの準備状況を確認",
+        "登録済みIT導入支援事業者・ITツールから導入候補を選び、見積を取得",
+        "直近の決算・納税情報と、導入前後の業務プロセス・工数を整理",
+        "道内の公的相談窓口または専門家に対象要件と計画書を確認してもらう"
+      ]
+    : isSustainableAid
+      ? [
+          "第20回公募要領を確認し、業種別の小規模事業者要件を判定",
+          "管轄の商工会・商工会議所へ早めに相談し、様式4を2026年12月4日までに依頼",
+          "販路開拓策、対象顧客、売上効果と対象経費の根拠を整理",
+          "2026年12月15日17:00の申請締切より余裕を持って電子申請",
+          "提出前に公募要領・申請システム上の入力内容を再確認"
+        ]
+      : [
+          "一般型第9回の正式な公募開始後、確定締切日と最新公募要領を確認",
+          "gBizIDプライムの準備状況を確認",
+          "現状の人手不足、作業時間、設備導入後の削減工数を数値化",
+          "対象設備・システムの見積と、投資回収・付加価値向上の根拠を整理",
+          "道内の公的相談窓口または専門家に対象要件と事業計画を確認してもらう"
+        ];
 
   return {
     title,
     recommendedSubsidy,
     subsidyMatches,
-    diagnosisNotice: "入力内容に基づく簡易診断です。対象要件・公募期間・補助対象経費は必ず最新の公式公募要領で確認してください。",
+    diagnosisNotice: `入力内容に基づく簡易診断です。制度情報は${SUBSIDY_INFO_VERIFIED_AT}に公式サイトで確認しています。対象要件・公募期間・補助対象経費は申請時に最新の公式公募要領で再確認してください。`,
     overview: {
       industry,
       location,
@@ -221,15 +253,9 @@ ${metricsTable.map(m => `| ${m.year} | ${m.laborProductivity} | **${m.productivi
       targetMetBadge: "数値目標案（公募要領との照合が必要）"
     },
     section5_NextActionsAndGuidance: {
-      gBizIdNotice: "申請には「gBizIDプライム」が必須です。発行には1〜2週間を要するため、直ちに取得手続きを開始してください。",
+      gBizIdNotice: "電子申請に必要となるgBizIDプライムの有無を確認し、未取得の場合は公式サイトで最新の取得方法と所要日数を確認してください。",
       specialistConsultationNotice: "道内の中小企業診断士・行政書士・商工会議所と連携し、最新の公募回要領と加点項目の最終チェックを行ってください。",
-      actionSteps: [
-        "gBizIDプライムの発行申請（印鑑証明書を準備して即日郵送）",
-        "SECURITY ACTION（一つ星または二つ星）の自己宣言完了（必須要件）",
-        "直近の決算書（別表4・勘定科目内訳明細等）および納税証明書その2の準備",
-        "IT導入支援事業者（または生成AIツールベンダー）の選定と見積取得",
-        "道内の専門家（行政書士・中小企業診断士）による申請書類の最終推敲"
-      ]
+      actionSteps
     },
     fullMarkdownText: fullMarkdown
   };
