@@ -1,5 +1,5 @@
 import { UserProfileInput, BusinessPlanResult, QuantitativeMetric, SubsidyMatch } from "../types";
-import { PHASE_ONE_SUBSIDIES, SUBSIDY_INFO_VERIFIED_AT } from "../constants";
+import { PHASE_ONE_SUBSIDIES, SUBSIDY_INFO_VERIFIED_AT } from "../constants.js";
 
 export function diagnoseSubsidies(input: UserProfileInput): SubsidyMatch[] {
   const purpose = input.investmentPurpose || "まだ決まっていない";
