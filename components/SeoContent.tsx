@@ -1,5 +1,6 @@
 import React from 'react';
 import { HelpCircle, MapPinned, SearchCheck, ShieldCheck } from 'lucide-react';
+import { PHASE_ONE_SUBSIDIES, SUBSIDY_INFO_VERIFIED_AT } from '../constants';
 
 const faqs = [
   {
@@ -54,6 +55,36 @@ export const SeoContent: React.FC = () => (
           <p className="mt-1 text-xs leading-6 text-slate-600">申請代行を依頼する前に、自社情報、投資目的、効果、数値目標のたたき台を用意できます。</p>
         </article>
       </div>
+    </div>
+
+    <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-8 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+        <div>
+          <p className="text-xs font-bold tracking-wider text-blue-700">主要3制度の最新情報</p>
+          <h2 className="mt-2 text-xl font-bold text-slate-950">補助率・上限額・直近スケジュール</h2>
+        </div>
+        <p className="text-xs text-slate-500">公式情報確認日：{SUBSIDY_INFO_VERIFIED_AT}</p>
+      </div>
+      <div className="mt-5 grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {PHASE_ONE_SUBSIDIES.map(item => (
+          <article key={item.name} className="rounded-xl border border-slate-200 p-4 flex flex-col">
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="font-bold text-slate-950 leading-6">{item.name}</h3>
+              <span className="shrink-0 rounded-full bg-blue-50 px-2 py-1 text-[10px] font-bold text-blue-700">{item.status}</span>
+            </div>
+            <p className="mt-3 text-xs leading-6 text-slate-600">{item.summary}</p>
+            <dl className="mt-3 space-y-2 text-xs leading-5">
+              <div><dt className="font-bold text-slate-800">補助率</dt><dd className="text-slate-600">{item.subsidyRate}</dd></div>
+              <div><dt className="font-bold text-slate-800">補助上限等</dt><dd className="text-slate-600">{item.subsidyAmount}</dd></div>
+              <div><dt className="font-bold text-slate-800">直近予定</dt><dd className="text-slate-600">{item.schedule}</dd></div>
+            </dl>
+            <a className="mt-4 min-h-11 inline-flex items-center text-sm font-bold text-blue-700 hover:text-blue-900" href={item.officialUrl} target="_blank" rel="noreferrer">
+              公式情報を確認する →
+            </a>
+          </article>
+        ))}
+      </div>
+      <p className="mt-4 text-[11px] leading-5 text-slate-500">公募日程・要件は変更される場合があります。申請時にはリンク先の最新公募要領を必ず確認してください。</p>
     </div>
 
     <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-8 shadow-sm">
